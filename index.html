@@ -17,7 +17,7 @@
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Parts Order Request</h1>
         <p class="text-center text-gray-500 mb-6">Fill out the form below to order parts for your home.
             <br>
-            [Image of a manufactured home]
+            
         </p>
         
         <form id="parts-form" class="space-y-4">
@@ -68,4 +68,280 @@
                 <input type="text" id="lot-number" name="lot-number" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
             </div>
             <div class="space-y-2">
-                <label for="serial-number" class="block text-sm font-medium text-gray-700">Serial
+                <label for="serial-number" class="block text-sm font-medium text-gray-700">Serial Number</label>
+                <input type="text" id="serial-number" name="serial-number" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+            </div>
+            
+            <div class="space-y-2">
+                <label for="home-manufacturer" class="block text-sm font-medium text-gray-700">Home Manufacturer</label>
+                <select id="home-manufacturer" name="home-manufacturer" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                    <option value="" disabled selected>Select a manufacturer</option>
+                    <option value="CAVCO/Fleetwood">CAVCO/Fleetwood</option>
+                    <option value="Champion Homes">Champion Homes</option>
+                    <option value="Clayton Athens">Clayton Athens</option>
+                    <option value="Clayton Bonham">Clayton Bonham</option>
+                    <option value="Clayton Southern Energy">Clayton Southern Energy</option>
+                    <option value="Clayton Sulphur Springs">Clayton Sulphur Springs</option>
+                    <option value="Clayton Waco1">Clayton Waco1</option>
+                    <option value="Jessup">Jessup</option>
+                    <option value="New Vision">New Vision</option>
+                    <option value="Oak Creek">Oak Creek</option>
+                </select>
+            </div>
+            
+            <div id="parts-container" class="space-y-6 mt-6">
+                </div>
+            
+            <div class="flex space-x-4">
+                <button type="button" id="add-part-btn" class="w-1/2 py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-full text-gray-700 font-semibold text-sm transition duration-150 ease-in-out">
+                    Add Another Part
+                </button>
+                <button type="button" id="remove-part-btn" class="w-1/2 py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-full text-gray-700 font-semibold text-sm transition duration-150 ease-in-out">
+                    Remove Last Part
+                </button>
+            </div>
+            
+            <div class="space-y-2 mt-4">
+                <label for="part-image" class="block text-sm font-medium text-gray-700">Upload Image of the Part (Optional)</label>
+                <input type="file" id="part-image" name="part-image" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-150 ease-in-out">
+            </div>
+            
+            <div class="mt-6">
+                <button type="submit" id="submit-btn" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold text-lg transition duration-150 ease-in-out shadow-lg">
+                    Submit Order
+                </button>
+            </div>
+        </form>
+
+        <div id="status-message" class="mt-6 p-4 rounded-lg text-center hidden"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Your EmailJS User ID, Service ID, and Template ID. Replace these with your own values.
+            const USER_ID = 'bSgwpRuVeEky48mPe'; 
+            const SERVICE_ID = 'service_7lbsq24';
+            const TEMPLATE_ID = 'template_mumbvhg';
+
+            // DOM elements
+            const form = document.getElementById('parts-form');
+            const communitySelect = document.getElementById('community-select');
+            const otherCommunityDiv = document.getElementById('other-community-div');
+            const otherCommunityInput = document.getElementById('other-community');
+            const statusDiv = document.getElementById('status-message');
+            const submitBtn = document.getElementById('submit-btn');
+            const removePartBtn = document.getElementById('remove-part-btn'); 
+            const userNameSelect = document.getElementById('user-name');
+            const userPhoneInput = document.getElementById('user-phone');
+            const companyEmailInput = document.getElementById('company-email');
+            const partsContainer = document.getElementById('parts-container');
+            const addPartBtn = document.getElementById('add-part-btn');
+            const formMainContent = document.querySelector('form'); // Select the form content to hide it
+
+            let partCounter = 0;
+
+            // Define part locations
+            const partLocations = [
+                "Exterior", 
+                "Primary Bedroom",
+                "Primary Bathroom",
+                "Bedroom #2",
+                "Bedroom #3",
+                "Bedroom #4",
+                "Flex Space",
+                "Hall",
+                "Guest Bath",
+                "Living Area",
+                "Laundry Area",
+                "Dining Area",
+                "Kitchen",
+                "Pantry"
+            ];
+            
+            // Function to add a new part entry
+            function addPartEntry() {
+                partCounter++;
+                const partDiv = document.createElement('div');
+                partDiv.classList.add('part-entry', 'bg-gray-50', 'p-4', 'rounded-lg', 'border', 'border-gray-200', 'space-y-2');
+                
+                partDiv.innerHTML = `
+                    <h3 class="font-semibold text-gray-700">Part #${partCounter}</h3>
+                    <div class="space-y-2">
+                        <label for="part-description-${partCounter}" class="block text-sm font-medium text-gray-700">Part Description</label>
+                        <textarea id="part-description-${partCounter}" name="part-description-${partCounter}" rows="2" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"></textarea>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="part-location-${partCounter}" class="block text-sm font-medium text-gray-700">Part Location</label>
+                        <select id="part-location-${partCounter}" name="part-location-${partCounter}" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                            <option value="" disabled selected>Select location</option>
+                            ${partLocations.map(location => `<option value="${location}">${location}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+                partsContainer.appendChild(partDiv);
+            }
+
+            // Function to remove the last part entry
+            function removePartEntry() {
+                const parts = partsContainer.querySelectorAll('.part-entry');
+                if (parts.length > 1) {
+                    const lastPart = parts[parts.length - 1];
+                    partsContainer.removeChild(lastPart);
+                    partCounter--;
+                }
+            }
+
+            // Function to reset the entire form and show it again
+            function resetForm() {
+                form.reset();
+                partsContainer.innerHTML = '';
+                partCounter = 0;
+                addPartEntry();
+                statusDiv.classList.add('hidden');
+                otherCommunityDiv.classList.add('hidden');
+                otherCommunityInput.required = false;
+                otherCommunityInput.name = 'unused';
+                formMainContent.style.display = 'block'; // Show the form again
+            }
+
+            // Initially add the first part entry
+            addPartEntry();
+
+            // Event listeners
+            addPartBtn.addEventListener('click', addPartEntry);
+            removePartBtn.addEventListener('click', removePartEntry);
+            
+            // Contact information for each company
+            const companyContacts = {
+                'G-Velasquez MHS': { phone: '903-715-3217', email: 'jerryleegvmhs@outlook.com' },
+                '345 Handyman Services': { phone: '817-902-9543', email: '345hsllc@gmail.com' },
+                'Hand in Hand Carpentry': { phone: '817-902-5404', email: 'big.eagle77@yahoo.com' },
+                'Jason Cappers': { phone: '318-540-9909', email: 'jason.cappers@peakenterprises.com' },
+                'Shawn Thomas': { phone: '817-995-1818', email: 'shawn.thomas@peakmhc.com' },
+                'Chris Brown': { phone: '512-775-0351', email: 'chris.brown@peakenterprises.com' },
+                'Jeff Braswell': { phone: '940-594-2891', email: 'jeff.braswell@peakenterprises.com' }
+            };
+
+            // Event listener to auto-populate phone number and email
+            userNameSelect.addEventListener('change', (event) => {
+                const selectedCompany = event.target.value;
+                const contacts = companyContacts[selectedCompany];
+                if (contacts) {
+                    userPhoneInput.value = contacts.phone;
+                    companyEmailInput.value = contacts.email;
+                } else {
+                    userPhoneInput.value = '';
+                    companyEmailInput.value = '';
+                }
+            });
+
+            // Handle "Other" option in community dropdown
+            communitySelect.addEventListener('change', (event) => {
+                if (event.target.value === 'Other') {
+                    otherCommunityDiv.classList.remove('hidden');
+                    otherCommunityInput.required = true;
+                    otherCommunityInput.name = 'home-address';
+                } else {
+                    otherCommunityDiv.classList.add('hidden');
+                    otherCommunityInput.required = false;
+                    otherCommunityInput.name = 'unused';
+                }
+            });
+
+            // Check if all EmailJS credentials are provided
+            if (USER_ID === 'bSgwpRuVeEky48mPe' || SERVICE_ID === 'service_7lbsq24' || TEMPLATE_ID === 'YOUR_EMAILJS_TEMPLATE_ID') {
+                statusDiv.classList.remove('hidden');
+                statusDiv.classList.add('bg-red-100', 'text-red-800');
+                statusDiv.innerHTML = '<strong>EmailJS is not fully configured.</strong> Please replace the placeholder IDs with your own.';
+                form.onsubmit = (e) => e.preventDefault();
+                return;
+            }
+
+            emailjs.init(USER_ID);
+
+            document.getElementById('parts-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Show loading state and hide the form
+                formMainContent.style.display = 'none';
+                statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+                statusDiv.classList.add('bg-blue-100', 'text-blue-800');
+                statusDiv.innerHTML = 'Sending request...';
+                
+                submitBtn.disabled = true;
+
+                const fileInput = document.getElementById('part-image');
+                let filePromise = Promise.resolve(null);
+
+                // If a file is selected, read it as a data URL
+                if (fileInput.files.length > 0) {
+                    filePromise = new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(fileInput.files[0]);
+                    });
+                }
+
+                filePromise.then(fileData => {
+                    // Determine the correct home address based on user selection
+                    let homeAddressValue = communitySelect.value;
+                    if (homeAddressValue === 'Other') {
+                        homeAddressValue = otherCommunityInput.value;
+                    }
+
+                    // Collect all part data
+                    const partDescriptions = document.querySelectorAll('[name^="part-description-"]');
+                    const partLocations = document.querySelectorAll('[name^="part-location-"]');
+                    let partsString = '';
+                    for (let i = 0; i < partDescriptions.length; i++) {
+                        partsString += `Part #${i + 1}:\n`;
+                        partsString += `  Location: ${partLocations[i].value}\n`;
+                        partsString += `  Description: ${partDescriptions[i].value}\n\n`;
+                    }
+
+                    const templateParams = {
+                        'user-name': form.elements['user-name'].value,
+                        'company-email': form.elements['company-email'].value,
+                        'user-phone': form.elements['user-phone'].value,
+                        'individual-name': form.elements['individual-name'].value,
+                        'home-address': homeAddressValue,
+                        'lot-number': form.elements['lot-number'].value,
+                        'serial-number': form.elements['serial-number'].value,
+                        'home-manufacturer': form.elements['home-manufacturer'].value,
+                        'part-description': partsString,
+                        'part-image-data': fileData ? fileData : 'No image uploaded.'
+                    };
+
+                    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+                        .then(function() {
+                            // Show success message with a Continue button
+                            statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
+                            statusDiv.classList.add('bg-green-100', 'text-green-800');
+                            statusDiv.innerHTML = '<strong>Success!</strong> Your parts order has been sent. <br><br> <button id="continue-btn" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold transition duration-150 ease-in-out">Continue</button>';
+                            
+                            // Add event listener to the newly created button
+                            document.getElementById('continue-btn').addEventListener('click', resetForm);
+                        }, function(error) {
+                            // Show failure message and the form again
+                            statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
+                            statusDiv.classList.add('bg-red-100', 'text-red-800');
+                            statusDiv.innerHTML = `<strong>Failed!</strong> There was an error sending your request. Error: ${JSON.stringify(error)}`;
+                            console.error('EmailJS Error:', error);
+                            formMainContent.style.display = 'block'; // Show the form on failure
+                        })
+                        .finally(() => {
+                            submitBtn.disabled = false;
+                        });
+                }).catch(error => {
+                    statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
+                    statusDiv.classList.add('bg-red-100', 'text-red-800');
+                    statusDiv.innerHTML = `<strong>Failed!</strong> There was an error processing your image. Error: ${JSON.stringify(error)}`;
+                    submitBtn.disabled = false;
+                    formMainContent.style.display = 'block'; // Show the form on image error
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
