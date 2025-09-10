@@ -106,11 +106,8 @@
                 <input type="file" id="part-image" name="part-image" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-150 ease-in-out">
             </div>
             
-            <div class="flex space-x-4 mt-6">
-                <button type="button" id="start-over-btn" class="w-1/2 py-3 px-4 bg-red-500 hover:bg-red-600 rounded-full text-white font-bold text-lg transition duration-150 ease-in-out shadow-lg">
-                    Start Over
-                </button>
-                <button type="submit" id="submit-btn" class="w-1/2 py-3 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold text-lg transition duration-150 ease-in-out shadow-lg">
+            <div class="mt-6">
+                <button type="submit" id="submit-btn" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold text-lg transition duration-150 ease-in-out shadow-lg">
                     Submit Order
                 </button>
             </div>
@@ -133,13 +130,13 @@
             const otherCommunityInput = document.getElementById('other-community');
             const statusDiv = document.getElementById('status-message');
             const submitBtn = document.getElementById('submit-btn');
-            const startOverBtn = document.getElementById('start-over-btn');
-            const removePartBtn = document.getElementById('remove-part-btn'); // New button element
+            const removePartBtn = document.getElementById('remove-part-btn'); 
             const userNameSelect = document.getElementById('user-name');
             const userPhoneInput = document.getElementById('user-phone');
             const companyEmailInput = document.getElementById('company-email');
             const partsContainer = document.getElementById('parts-container');
             const addPartBtn = document.getElementById('add-part-btn');
+            const formMainContent = document.querySelector('form'); // Select the form content to hide it
 
             let partCounter = 0;
 
@@ -194,7 +191,7 @@
                 }
             }
 
-            // Function to reset the entire form
+            // Function to reset the entire form and show it again
             function resetForm() {
                 form.reset();
                 partsContainer.innerHTML = '';
@@ -204,6 +201,7 @@
                 otherCommunityDiv.classList.add('hidden');
                 otherCommunityInput.required = false;
                 otherCommunityInput.name = 'unused';
+                formMainContent.style.display = 'block'; // Show the form again
             }
 
             // Initially add the first part entry
@@ -211,8 +209,7 @@
 
             // Event listeners
             addPartBtn.addEventListener('click', addPartEntry);
-            removePartBtn.addEventListener('click', removePartEntry); // New event listener
-            startOverBtn.addEventListener('click', resetForm);
+            removePartBtn.addEventListener('click', removePartEntry);
             
             // Contact information for each company
             const companyContacts = {
@@ -265,10 +262,12 @@
             document.getElementById('parts-form').addEventListener('submit', function(event) {
                 event.preventDefault();
                 
-                // Show loading state
+                // Show loading state and hide the form
+                formMainContent.style.display = 'none';
                 statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
                 statusDiv.classList.add('bg-blue-100', 'text-blue-800');
                 statusDiv.innerHTML = 'Sending request...';
+                
                 submitBtn.disabled = true;
 
                 const fileInput = document.getElementById('part-image');
@@ -303,7 +302,7 @@
 
                     const templateParams = {
                         'user-name': form.elements['user-name'].value,
-                        'company-email': form.elements['company-email'].value, // Corrected from 'user-email'
+                        'company-email': form.elements['company-email'].value,
                         'user-phone': form.elements['user-phone'].value,
                         'individual-name': form.elements['individual-name'].value,
                         'home-address': homeAddressValue,
@@ -316,15 +315,20 @@
 
                     emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
                         .then(function() {
+                            // Show success message with a Continue button
                             statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
                             statusDiv.classList.add('bg-green-100', 'text-green-800');
-                            statusDiv.innerHTML = '<strong>Success!</strong> Your parts order has been sent.';
-                            resetForm();
+                            statusDiv.innerHTML = '<strong>Success!</strong> Your parts order has been sent. <br><br> <button id="continue-btn" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold transition duration-150 ease-in-out">Continue</button>';
+                            
+                            // Add event listener to the newly created button
+                            document.getElementById('continue-btn').addEventListener('click', resetForm);
                         }, function(error) {
+                            // Show failure message and the form again
                             statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
                             statusDiv.classList.add('bg-red-100', 'text-red-800');
                             statusDiv.innerHTML = `<strong>Failed!</strong> There was an error sending your request. Error: ${JSON.stringify(error)}`;
                             console.error('EmailJS Error:', error);
+                            formMainContent.style.display = 'block'; // Show the form on failure
                         })
                         .finally(() => {
                             submitBtn.disabled = false;
@@ -334,6 +338,7 @@
                     statusDiv.classList.add('bg-red-100', 'text-red-800');
                     statusDiv.innerHTML = `<strong>Failed!</strong> There was an error processing your image. Error: ${JSON.stringify(error)}`;
                     submitBtn.disabled = false;
+                    formMainContent.style.display = 'block'; // Show the form on image error
                 });
             });
         })();
