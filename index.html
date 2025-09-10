@@ -249,6 +249,16 @@
             document.getElementById('parts-form').addEventListener('submit', function(event) {
                 event.preventDefault();
                 
+                const companyEmail = form.elements['company-email'].value;
+                if (!companyEmail) {
+                    // Show validation error for email
+                    statusDiv.classList.remove('hidden', 'bg-blue-100', 'text-blue-800', 'bg-green-100', 'text-green-800');
+                    statusDiv.classList.add('bg-red-100', 'text-red-800');
+                    statusDiv.innerHTML = '<strong>Error!</strong> Please provide a company email address.';
+                    formMainContent.style.display = 'block';
+                    return; // Stop the function from proceeding
+                }
+
                 // Show loading state and hide the form
                 formMainContent.style.display = 'none';
                 statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
@@ -269,7 +279,7 @@
 
                 const orderRequestParams = {
                     'user-name': form.elements['user-name'].value,
-                    'company-email': form.elements['company-email'].value,
+                    'company-email': companyEmail,
                     'user-phone': form.elements['user-phone'].value,
                     'individual-name': form.elements['individual-name'].value,
                     'home-address': communitySelect.value === 'Other' ? otherCommunityInput.value : communitySelect.value,
@@ -280,7 +290,7 @@
                 };
                 
                 const confirmationParams = {
-                    'to_email': form.elements['company-email'].value,
+                    'to_email': companyEmail,
                     'to_name': form.elements['individual-name'].value,
                     'message': partsString,
                     'lot-number': form.elements['lot-number'].value,
