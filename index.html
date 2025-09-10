@@ -101,11 +101,6 @@
                 </button>
             </div>
             
-            <div class="space-y-2 mt-4">
-                <label for="part-image" class="block text-sm font-medium text-gray-700">Upload Image of the Part (Optional)</label>
-                <input type="file" id="part-image" name="part-image" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-150 ease-in-out">
-            </div>
-            
             <div class="mt-6">
                 <button type="submit" id="submit-btn" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold text-lg transition duration-150 ease-in-out shadow-lg">
                     Submit Order
@@ -122,6 +117,7 @@
             const USER_ID = 'bSgwpRuVeEky48mPe'; 
             const SERVICE_ID = 'service_7lbsq24';
             const TEMPLATE_ID = 'template_mumbvhg';
+            const CONFIRMATION_TEMPLATE_ID = 'template_k6klnym';
 
             // DOM elements
             const form = document.getElementById('parts-form');
@@ -201,7 +197,7 @@
                 otherCommunityDiv.classList.add('hidden');
                 otherCommunityInput.required = false;
                 otherCommunityInput.name = 'unused';
-                formMainContent.style.display = 'block'; // Show the form again
+                formMainContent.style.display = 'block';
             }
 
             // Initially add the first part entry
@@ -248,17 +244,6 @@
                 }
             });
 
-            // This is the line that's causing the issue. The string values here are the original placeholders.
-            // The check is failing because your variables are correct, but they are not the same as these strings.
-            // I've removed this check entirely, because if you've populated your IDs, you don't need it.
-            // if (USER_ID === 'bSgwpRuVeEky48mPe' || SERVICE_ID === 'service_7lbsq24' || TEMPLATE_ID === 'template_mumbvhg') {
-            //     statusDiv.classList.remove('hidden');
-            //     statusDiv.classList.add('bg-red-100', 'text-red-800');
-            //     statusDiv.innerHTML = '<strong>EmailJS is not fully configured.</strong> It appears the placeholder IDs are still in the code.';
-            //     form.onsubmit = (e) => e.preventDefault();
-            //     return;
-            // }
-
             emailjs.init(USER_ID);
 
             document.getElementById('parts-form').addEventListener('submit', function(event) {
@@ -271,77 +256,62 @@
                 statusDiv.innerHTML = 'Sending request...';
                 
                 submitBtn.disabled = true;
-
-                const fileInput = document.getElementById('part-image');
-                let filePromise = Promise.resolve(null);
-
-                // If a file is selected, read it as a data URL
-                if (fileInput.files.length > 0) {
-                    filePromise = new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(fileInput.files[0]);
-                    });
+                
+                // Collect all part data and build the string
+                const partDescriptions = document.querySelectorAll('[name^="part-description-"]');
+                const partLocations = document.querySelectorAll('[name^="part-location-"]');
+                let partsString = '';
+                for (let i = 0; i < partDescriptions.length; i++) {
+                    partsString += `Part #${i + 1}:\n`;
+                    partsString += `  Location: ${partLocations[i].value}\n`;
+                    partsString += `  Description: ${partDescriptions[i].value}\n\n`;
                 }
 
-                filePromise.then(fileData => {
-                    // Determine the correct home address based on user selection
-                    let homeAddressValue = communitySelect.value;
-                    if (homeAddressValue === 'Other') {
-                        homeAddressValue = otherCommunityInput.value;
-                    }
+                const orderRequestParams = {
+                    'user-name': form.elements['user-name'].value,
+                    'company-email': form.elements['company-email'].value,
+                    'user-phone': form.elements['user-phone'].value,
+                    'individual-name': form.elements['individual-name'].value,
+                    'home-address': communitySelect.value === 'Other' ? otherCommunityInput.value : communitySelect.value,
+                    'lot-number': form.elements['lot-number'].value,
+                    'serial-number': form.elements['serial-number'].value,
+                    'home-manufacturer': form.elements['home-manufacturer'].value,
+                    'part-description': partsString,
+                };
+                
+                const confirmationParams = {
+                    'to_email': form.elements['company-email'].value,
+                    'to_name': form.elements['individual-name'].value,
+                    'message': partsString,
+                    'lot-number': form.elements['lot-number'].value,
+                    'home-address': communitySelect.value === 'Other' ? otherCommunityInput.value : communitySelect.value,
+                };
 
-                    // Collect all part data
-                    const partDescriptions = document.querySelectorAll('[name^="part-description-"]');
-                    const partLocations = document.querySelectorAll('[name^="part-location-"]');
-                    let partsString = '';
-                    for (let i = 0; i < partDescriptions.length; i++) {
-                        partsString += `Part #${i + 1}:\n`;
-                        partsString += `  Location: ${partLocations[i].value}\n`;
-                        partsString += `  Description: ${partDescriptions[i].value}\n\n`;
-                    }
-
-                    const templateParams = {
-                        'user-name': form.elements['user-name'].value,
-                        'company-email': form.elements['company-email'].value,
-                        'user-phone': form.elements['user-phone'].value,
-                        'individual-name': form.elements['individual-name'].value,
-                        'home-address': homeAddressValue,
-                        'lot-number': form.elements['lot-number'].value,
-                        'serial-number': form.elements['serial-number'].value,
-                        'home-manufacturer': form.elements['home-manufacturer'].value,
-                        'part-description': partsString,
-                        'part-image-data': fileData ? fileData : 'No image uploaded.'
-                    };
-
-                    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
-                        .then(function() {
-                            // Show success message with a Continue button
-                            statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
-                            statusDiv.classList.add('bg-green-100', 'text-green-800');
-                            statusDiv.innerHTML = '<strong>Success!</strong> Your parts order has been sent. <br><br> <button id="continue-btn" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold transition duration-150 ease-in-out">Continue</button>';
-                            
-                            // Add event listener to the newly created button
-                            document.getElementById('continue-btn').addEventListener('click', resetForm);
-                        }, function(error) {
-                            // Show failure message and the form again
-                            statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
-                            statusDiv.classList.add('bg-red-100', 'text-red-800');
-                            statusDiv.innerHTML = `<strong>Failed!</strong> There was an error sending your request. Error: ${JSON.stringify(error)}`;
-                            console.error('EmailJS Error:', error);
-                            formMainContent.style.display = 'block'; // Show the form on failure
-                        })
-                        .finally(() => {
-                            submitBtn.disabled = false;
-                        });
-                }).catch(error => {
-                    statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
-                    statusDiv.classList.add('bg-red-100', 'text-red-800');
-                    statusDiv.innerHTML = `<strong>Failed!</strong> There was an error processing your image. Error: ${JSON.stringify(error)}`;
-                    submitBtn.disabled = false;
-                    formMainContent.style.display = 'block'; // Show the form on image error
-                });
+                // First, send the parts order request
+                emailjs.send(SERVICE_ID, TEMPLATE_ID, orderRequestParams)
+                    .then(function() {
+                        // On success, send the confirmation email to the user
+                        return emailjs.send(SERVICE_ID, CONFIRMATION_TEMPLATE_ID, confirmationParams);
+                    })
+                    .then(function() {
+                        // Show success message with a Continue button after both emails are sent
+                        statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
+                        statusDiv.classList.add('bg-green-100', 'text-green-800');
+                        statusDiv.innerHTML = '<strong>Success!</strong> Your parts order has been sent, and a confirmation email has been sent to your inbox. <br><br> <button id="continue-btn" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold transition duration-150 ease-in-out">Continue</button>';
+                        
+                        // Add event listener to the newly created button
+                        document.getElementById('continue-btn').addEventListener('click', resetForm);
+                    }, function(error) {
+                        // Handle failure of either email and show the form again
+                        statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
+                        statusDiv.classList.add('bg-red-100', 'text-red-800');
+                        statusDiv.innerHTML = `<strong>Failed!</strong> There was an error sending your request. Error: ${JSON.stringify(error)}`;
+                        console.error('EmailJS Error:', error);
+                        formMainContent.style.display = 'block';
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                    });
             });
         })();
     </script>
