@@ -214,7 +214,7 @@
                 '345 Handyman Services': { phone: '817-902-9543', email: '345hsllc@gmail.com' },
                 'Hand in Hand Carpentry': { phone: '817-902-5404', email: 'big.eagle77@yahoo.com' },
                 'Jason Cappers': { phone: '318-540-9909', email: 'jason.cappers@peakenterprises.com' },
-                'Shawn Thomas': { phone: '817-995-1818', email: 'shawn.thomas@peakmhc.com' },
+                'Shawn Thomas': { phone: '817-995-1818', email: 'parts@peakmhc.com' },
                 'Chris Brown': { phone: '512-775-0351', email: 'chris.brown@peakenterprises.com' },
                 'Jeff Braswell': { phone: '940-594-2891', email: 'jeff.braswell@peakenterprises.com' }
             };
@@ -301,6 +301,8 @@
                     'message': partsString,
                     'lot-number': form.elements['lot-number'].value,
                     'home-address': communitySelect.value === 'Other' ? otherCommunityInput.value : communitySelect.value,
+                    'serial-number': form.elements['serial-number'].value,
+                    'home-manufacturer': form.elements['home-manufacturer'].value,
                 };
 
                 // First, send the parts order request
