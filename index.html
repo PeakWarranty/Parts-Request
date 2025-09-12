@@ -294,12 +294,15 @@
                 
                 const confirmationParams = {
                     'to_email': companyEmail,
-                    'to_name': form.elements['individual-name'].value,
-                    'message': partsString,
-                    'lot-number': form.elements['lot-number'].value,
+                    'user-name': form.elements['user-name'].value,
+                    'individual-name': form.elements['individual-name'].value,
+                    'user-phone': form.elements['user-phone'].value,
+                    'company-email': companyEmail,
                     'home-address': communitySelect.value === 'Other' ? otherCommunityInput.value : communitySelect.value,
+                    'lot-number': form.elements['lot-number'].value,
                     'serial-number': form.elements['serial-number'].value,
                     'home-manufacturer': form.elements['home-manufacturer'].value,
+                    'message': partsString,
                 };
 
                 // First, send the parts order request
