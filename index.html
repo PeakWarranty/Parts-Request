@@ -10,6 +10,9 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+        .part-entry:not(:first-child) {
+            margin-top: 1.5rem; /* Add spacing between multiple parts */
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
@@ -17,7 +20,6 @@
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Parts Order Request</h1>
         <p class="text-center text-gray-500 mb-6">Fill out the form below to order parts for your home.
             <br>
-            
         </p>
         
         <form id="parts-form" class="space-y-4">
@@ -25,18 +27,25 @@
                 <label for="user-name" class="block text-sm font-medium text-gray-700">Company Name</label>
                 <select id="user-name" name="user-name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
                     <option value="" disabled selected>Select a company</option>
-                    <option value="G-Velasquez MHS">G-Velasquez MHS</option>
                     <option value="345 Handyman Services">345 Handyman Services</option>
+                    <option value="G-Velasquez MHS">G-Velasquez MHS</option>
                     <option value="Hand in Hand Carpentry">Hand in Hand Carpentry</option>
-                    <option value="Jason Cappers">Jason Cappers</option>
-                    <option value="Shawn Thomas">Shawn Thomas</option>
-                    <option value="Chris Brown">Chris Brown</option>
-                    <option value="Jeff Braswell">Jeff Braswell</option>
+                    <option value="Peak Enterprises">Peak Enterprises</option>
                 </select>
             </div>
             <div class="space-y-2">
                 <label for="individual-name" class="block text-sm font-medium text-gray-700">Individual requesting parts</label>
-                <input type="text" id="individual-name" name="individual-name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                <!-- UPDATED TO DROPDOWN -->
+                <select id="individual-name" name="individual-name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                    <option value="" disabled selected>Select individual</option>
+                    <option value="Carl Thomas">Carl Thomas</option>
+                    <option value="Chris Brown">Chris Brown</option>
+                    <option value="Jason Cappers">Jason Cappers</option>
+                    <option value="Jeff Braswell">Jeff Braswell</option>
+                    <option value="Jerry Velasquez">Jerry Velasquez</option>
+                    <option value="Ray Howell">Ray Howell</option>
+                    <option value="Shawn Thomas">Shawn Thomas</option>
+                </select>
             </div>
             <div class="space-y-2">
                 <label for="user-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
@@ -93,11 +102,11 @@
             <div id="parts-container" class="space-y-6 mt-6">
             </div>
             
-            <div class="flex space-x-4">
+            <div class="flex space-x-4 pt-4">
                 <button type="button" id="add-part-btn" class="w-1/2 py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-full text-gray-700 font-semibold text-sm transition duration-150 ease-in-out">
                     Add Another Part
                 </button>
-                <button type="button" id="remove-part-btn" class="w-1/2 py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-full text-gray-700 font-semibold text-sm transition duration-150 ease-in-out">
+                <button type="button" id="remove-part-btn" disabled class="w-1/2 py-2 px-4 bg-gray-200 opacity-50 cursor-not-allowed rounded-full text-gray-700 font-semibold text-sm transition duration-150 ease-in-out">
                     Remove Last Part
                 </button>
             </div>
@@ -129,6 +138,7 @@
             const submitBtn = document.getElementById('submit-btn');
             const removePartBtn = document.getElementById('remove-part-btn'); 
             const userNameSelect = document.getElementById('user-name');
+            const individualNameSelect = document.getElementById('individual-name'); // New reference to the individual dropdown
             const userPhoneInput = document.getElementById('user-phone');
             const companyEmailInput = document.getElementById('company-email');
             const partsContainer = document.getElementById('parts-container');
@@ -152,30 +162,66 @@
                 "Laundry Area",
                 "Dining Area",
                 "Kitchen",
-                "Pantry"
+                "Pantry",
+                "Marriage Line"
             ];
+            
+            // Function to update the disabled state of the remove button
+            function updateRemoveButtonState() {
+                const parts = partsContainer.querySelectorAll('.part-entry');
+                if (parts.length <= 1) {
+                    removePartBtn.disabled = true;
+                    removePartBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    removePartBtn.disabled = false;
+                    removePartBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
             
             // Function to add a new part entry
             function addPartEntry() {
                 partCounter++;
                 const partDiv = document.createElement('div');
-                partDiv.classList.add('part-entry', 'bg-gray-50', 'p-4', 'rounded-lg', 'border', 'border-gray-200', 'space-y-2');
+                partDiv.classList.add('part-entry', 'bg-gray-50', 'p-4', 'rounded-lg', 'border', 'border-gray-200', 'space-y-4');
                 
                 partDiv.innerHTML = `
                     <h3 class="font-semibold text-gray-700">Part #${partCounter}</h3>
-                    <div class="space-y-2">
-                        <label for="part-description-${partCounter}" class="block text-sm font-medium text-gray-700">Part Description</label>
-                        <textarea id="part-description-${partCounter}" name="part-description-${partCounter}" rows="2" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"></textarea>
+                    
+                    <div class="flex space-x-4">
+                        <div class="w-1/3 space-y-2">
+                            <label for="part-quantity-${partCounter}" class="block text-sm font-medium text-gray-700">Quantity</label>
+                            <input type="number" id="part-quantity-${partCounter}" name="part-quantity-${partCounter}" min="1" value="1" required 
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                        </div>
+                        <div class="w-2/3 space-y-2">
+                            <label for="part-location-${partCounter}" class="block text-sm font-medium text-gray-700">Part Location In Home</label>
+                            <select id="part-location-${partCounter}" name="part-location-${partCounter}" required 
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                                <option value="" disabled selected>Select location</option>
+                                ${partLocations.map(location => `<option value="${location}">${location}</option>`).join('')}
+                            </select>
+                        </div>
                     </div>
+
                     <div class="space-y-2">
-                        <label for="part-location-${partCounter}" class="block text-sm font-medium text-gray-700">Part Location</label>
-                        <select id="part-location-${partCounter}" name="part-location-${partCounter}" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                            <option value="" disabled selected>Select location</option>
-                            ${partLocations.map(location => `<option value="${location}">${location}</option>`).join('')}
+                        <label for="part-description-${partCounter}" class="block text-sm font-medium text-gray-700">Part Description / Details</label>
+                        <textarea id="part-description-${partCounter}" name="part-description-${partCounter}" rows="2" required 
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"></textarea>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="part-reason-${partCounter}" class="block text-sm font-medium text-gray-700">Reason for Request</label>
+                        <select id="part-reason-${partCounter}" name="part-reason-${partCounter}" required 
+                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                            <option value="" disabled selected>Select reason</option>
+                            <option value="Damaged">Damaged</option>
+                            <option value="Missing from Ship Loose">Missing from Ship Loose</option>
+                            <option value="Service">Service</option>
                         </select>
                     </div>
                 `;
                 partsContainer.appendChild(partDiv);
+                updateRemoveButtonState();
             }
 
             // Function to remove the last part entry
@@ -185,6 +231,7 @@
                     const lastPart = parts[parts.length - 1];
                     partsContainer.removeChild(lastPart);
                     partCounter--;
+                    updateRemoveButtonState();
                 }
             }
 
@@ -199,6 +246,7 @@
                 otherCommunityInput.required = false;
                 otherCommunityInput.name = 'unused';
                 formMainContent.style.display = 'block';
+                updateRemoveButtonState(); // Ensure the button is disabled after reset
             }
 
             // Initially add the first part entry
@@ -208,21 +256,25 @@
             addPartBtn.addEventListener('click', addPartEntry);
             removePartBtn.addEventListener('click', removePartEntry);
             
-            // Contact information for each company
-            const companyContacts = {
-                'G-Velasquez MHS': { phone: '903-715-3217', email: 'jerryleegvmhs@outlook.com' },
-                '345 Handyman Services': { phone: '817-902-9543', email: '345hsllc@gmail.com' },
-                'Hand in Hand Carpentry': { phone: '817-902-5404', email: 'big.eagle77@yahoo.com' },
+            // --- NEW CONTACT LOGIC ---
+            // 1. Contact information for each individual
+            const individualContacts = {
+                'Carl Thomas': { phone: '817-902-9543', email: '345hsllc@gmail.com' },
+                'Jerry Velasquez': { phone: '903-715-3217', email: 'jerryleevmhs@outlook.com' },
+                'Ray Howell': { phone: '817-902-5404', email: 'big.eagle77@yahoo.com' },
+                'Shawn Thomas': { phone: '817-995-1818', email: 'shawn@peakmhc.com' },
                 'Jason Cappers': { phone: '318-540-9909', email: 'jason.cappers@peakenterprises.com' },
-                'Shawn Thomas': { phone: '817-995-1818', email: 'shawn.thomas.peakmhc@gmail.com' },
-                'Chris Brown': { phone: '512-775-0351', email: 'chris.brown@peakenterprises.com' },
-                'Jeff Braswell': { phone: '940-594-2891', email: 'jeff.braswell@peakenterprises.com' }
+                'Jeff Braswell': { phone: '940-594-2891', email: 'jeff.braswell@peakenterprises.com' },
+                'Chris Brown': { phone: '512-777-0351', email: 'chris.brown@peakenterprises.com' }
             };
 
-            // Event listener to auto-populate phone number and email
-            userNameSelect.addEventListener('change', (event) => {
-                const selectedCompany = event.target.value;
-                const contacts = companyContacts[selectedCompany];
+            // 2. Event listener to auto-populate phone number and email based on the INDIVIDUAL
+            individualNameSelect.addEventListener('change', (event) => {
+                const selectedIndividual = event.target.value;
+                const contacts = individualContacts[selectedIndividual];
+                
+                // Clear company contact info, as it is no longer used for auto-fill
+                // We are now only auto-filling the individual's contact fields
                 if (contacts) {
                     userPhoneInput.value = contacts.phone;
                     companyEmailInput.value = contacts.email;
@@ -231,6 +283,7 @@
                     companyEmailInput.value = '';
                 }
             });
+            // --- END NEW CONTACT LOGIC ---
 
             // Handle "Other" option in community dropdown
             communitySelect.addEventListener('change', (event) => {
@@ -273,10 +326,15 @@
                 // Collect all part data and build the string
                 const partDescriptions = document.querySelectorAll('[name^="part-description-"]');
                 const partLocations = document.querySelectorAll('[name^="part-location-"]');
+                const partQuantities = document.querySelectorAll('[name^="part-quantity-"]');
+                const partReasons = document.querySelectorAll('[name^="part-reason-"]'); // NEW: Get reasons
+                
                 let partsString = '';
                 for (let i = 0; i < partDescriptions.length; i++) {
                     partsString += `Part #${i + 1}:\n`;
+                    partsString += `  Quantity: ${partQuantities[i].value}\n`;
                     partsString += `  Location: ${partLocations[i].value}\n`;
+                    partsString += `  Reason: ${partReasons[i].value}\n`; // NEW: Include reason
                     partsString += `  Description: ${partDescriptions[i].value}\n\n`;
                 }
 
