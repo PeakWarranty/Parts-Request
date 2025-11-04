@@ -3,393 +3,518 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manufactured Home Parts Order</title>
+    <!-- CHANGE 1: Update the HTML document title -->
+    <title>21-Day Manufactured Home Warranty Checklist</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        .part-entry:not(:first-child) {
-            margin-top: 1.5rem; /* Add spacing between multiple parts */
-        }
+        /* Custom styling for status cards */
+        .card-UNCHECKED { border-color: #e5e7eb; background-color: #ffffff; }
+        .card-OK { border-color: #6ee7b7; background-color: #f0fdfa; }
+        .card-ISSUE { border-color: #fca5a5; background-color: #fef2f2; }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl border border-gray-200">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Parts Order Request</h1>
-        <p class="text-center text-gray-500 mb-6">Fill out the form below to order parts for your home.
-            <br>
-        </p>
-        
-        <form id="parts-form" class="space-y-4">
-            <div class="space-y-2">
-                <label for="user-name" class="block text-sm font-medium text-gray-700">Company Name</label>
-                <select id="user-name" name="user-name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                    <option value="" disabled selected>Select a company</option>
-                    <option value="345 Handyman Services">345 Handyman Services</option>
-                    <option value="G-Velasquez MHS">G-Velasquez MHS</option>
-                    <option value="Hand in Hand Carpentry">Hand in Hand Carpentry</option>
-                    <option value="Peak Enterprises">Peak Enterprises</option>
-                </select>
-            </div>
-            <div class="space-y-2">
-                <label for="individual-name" class="block text-sm font-medium text-gray-700">Individual requesting parts</label>
-                <!-- UPDATED TO DROPDOWN -->
-                <select id="individual-name" name="individual-name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                    <option value="" disabled selected>Select individual</option>
-                    <option value="Carl Thomas">Carl Thomas</option>
-                    <option value="Chris Brown">Chris Brown</option>
-                    <option value="Jason Cappers">Jason Cappers</option>
-                    <option value="Jeff Braswell">Jeff Braswell</option>
-                    <option value="Jerry Velasquez">Jerry Velasquez</option>
-                    <option value="Ray Howell">Ray Howell</option>
-                    <option value="Shawn Thomas">Shawn Thomas</option>
-                </select>
-            </div>
-            <div class="space-y-2">
-                <label for="user-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                <input type="tel" id="user-phone" name="user-phone" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-            </div>
-            <div class="space-y-2">
-                <label for="company-email" class="block text-sm font-medium text-gray-700">Company Email</label>
-                <input type="email" id="company-email" name="company-email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-            </div>
-            
-            <div class="space-y-2">
-                <label for="home-address" class="block text-sm font-medium text-gray-700">Community</label>
-                <select id="community-select" name="community" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                    <option value="" disabled selected>Select your community</option>
-                    <option value="Rancho Serenidad">Rancho Serenidad</option>
-                    <option value="Villas De Mariposa">Villas De Mariposa</option>
-                    <option value="Brazos Point">Brazos Point</option>
-                    <option value="Solena">Solena</option>
-                    <option value="Other">Other (Please specify)</option>
-                </select>
-            </div>
-            
-            <div id="other-community-div" class="space-y-2 hidden">
-                <label for="other-community" class="block text-sm font-medium text-gray-700">Specify Community</label>
-                <input type="text" id="other-community" name="home-address" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-            </div>
-            <div class="space-y-2">
-                <label for="lot-number" class="block text-sm font-medium text-gray-700">Lot Number</label>
-                <input type="text" id="lot-number" name="lot-number" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-            </div>
-            <div class="space-y-2">
-                <label for="serial-number" class="block text-sm font-medium text-gray-700">Serial Number</label>
-                <input type="text" id="serial-number" name="serial-number" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-            </div>
-            
-            <div class="space-y-2">
-                <label for="home-manufacturer" class="block text-sm font-medium text-gray-700">Home Manufacturer</label>
-                <select id="home-manufacturer" name="home-manufacturer" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                    <option value="" disabled selected>Select a manufacturer</option>
-                    <option value="CAVCO/Fleetwood">CAVCO/Fleetwood</option>
-                    <option value="Champion Homes">Champion Homes</option>
-                    <option value="Clayton Athens">Clayton Athens</option>
-                    <option value="Clayton Bonham">Clayton Bonham</option>
-                    <option value="Clayton Southern Energy">Clayton Southern Energy</option>
-                    <option value="Clayton Sulphur Springs">Clayton Sulphur Springs</option>
-                    <option value="Clayton Waco1">Clayton Waco1</option>
-                    <option value="Jessup">Jessup</option>
-                    <option value="New Vision">New Vision</option>
-                    <option value="Oak Creek">Oak Creek</option>
-                    <option value="RGN">RGN</option>
-                </select>
-            </div>
-            
-            <div id="parts-container" class="space-y-6 mt-6">
-            </div>
-            
-            <div class="flex space-x-4 pt-4">
-                <button type="button" id="add-part-btn" class="w-1/2 py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-full text-gray-700 font-semibold text-sm transition duration-150 ease-in-out">
-                    Add Another Part
-                </button>
-                <button type="button" id="remove-part-btn" disabled class="w-1/2 py-2 px-4 bg-gray-200 opacity-50 cursor-not-allowed rounded-full text-gray-700 font-semibold text-sm transition duration-150 ease-in-out">
-                    Remove Last Part
-                </button>
-            </div>
-            
-            <div class="mt-6">
-                <button type="submit" id="submit-btn" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold text-lg transition duration-150 ease-in-out shadow-lg">
-                    Submit Order
-                </button>
-            </div>
-        </form>
+<body class="bg-gray-100 p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="4xl font-extrabold text-gray-900">
+                <!-- CHANGE 2: Update the visible header text -->
+                21-Day Move-In Warranty Checklist
+            </h1>
+            <p class="text-lg text-gray-600 mt-2">
+                For New Manufactured Home Owners
+            </p>
+        </header>
 
+        <!-- Main Form Container -->
+        <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-gray-200">
+            <form id="warranty-form" class="space-y-6">
+                <!-- Property Information -->
+                <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl space-y-3">
+                    <h2 class="text-xl font-bold text-blue-700">Property Information (Required)</h2>
+                    <input type="text" id="homeownerName" name="homeownerName" placeholder="Occupant Name *" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    
+                    <!-- Occupancy Status Field -->
+                    <select id="occupancyStatus" name="occupancyStatus" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="" disabled selected>Occupancy Status *</option>
+                        <option value="Owner">Owner</option>
+                        <option value="Renter">Renter</option>
+                    </select>
+
+                    <select id="community" name="community" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="" disabled selected>Select Community *</option>
+                        <option value="Rancho Serenidad">Rancho Serenidad</option>
+                        <option value="Villas De Mariposa">Villas De Mariposa</option>
+                        <option value="Brazos Pointe">Brazos Pointe</option>
+                        <option value="Solena">Solena</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    
+                    <div id="otherCommunityDiv" class="hidden">
+                         <input type="text" id="otherCommunity" name="otherCommunity" placeholder="Specify Other Community Name *" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="space-y-2">
+                            <!-- CHANGE 1: Placeholder text updated -->
+                            <input type="text" id="lotNumber" name="lotNumber" placeholder="Lot Number or Street Address *" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div class="space-y-2">
+                            <input type="text" id="serialNumber" name="serialNumber" placeholder="Home Serial Number" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <!-- REMINDER TEXT -->
+                            <p class="text-xs text-gray-500 mt-1 ml-1">This can be found on the Data Sheet located under your kitchen sink.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <input type="tel" id="contactPhone" name="contactPhone" placeholder="Contact Phone Number" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <input type="email" id="email" name="email" placeholder="Email Address *" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                </div>
+
+                <!-- Checklist Container -->
+                <div id="checklist-container" class="space-y-6">
+                    <!-- Dynamic sections will be rendered here -->
+                </div>
+
+                <div id="issue-summary-box" class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 font-semibold hidden"></div>
+
+                <div class="mt-8 pt-4 border-t">
+                     <button type="submit" id="submit-btn" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold text-lg transition duration-150 ease-in-out shadow-lg">
+                        Submit Warranty Request
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Status Message Div (Now outside the form structure) -->
         <div id="status-message" class="mt-6 p-4 rounded-lg text-center hidden"></div>
     </div>
 
     <script>
-        (function() {
-            // Your EmailJS User ID, Service ID, and Template ID.
-            const USER_ID = 'bSgwpRuVeEky48mPe'; 
-            const SERVICE_ID = 'service_7lbsq24';
-            const TEMPLATE_ID = 'template_mumbvhg';
-            const CONFIRMATION_TEMPLATE_ID = 'template_k6klnym';
+        // --- CONFIGURATION DATA ---
+        // 🚨 IMPORTANT: These IDs are based on our confirmed working configuration.
+        const USER_ID = 'bSgwpRuVeEky48mPe'; 
+        const SERVICE_ID = 'service_duw9hhb'; 
+        const PRIMARY_TEMPLATE_ID = 'of2vt65'; // Sent to warranty team (was template_dvr6oem)
+        const CONFIRMATION_TEMPLATE_ID = '2a7qx72'; // Sent to homeowner
 
-            // DOM elements
-            const form = document.getElementById('parts-form');
-            const communitySelect = document.getElementById('community-select');
-            const otherCommunityDiv = document.getElementById('other-community-div');
-            const otherCommunityInput = document.getElementById('other-community');
-            const statusDiv = document.getElementById('status-message');
-            const submitBtn = document.getElementById('submit-btn');
-            const removePartBtn = document.getElementById('remove-part-btn'); 
-            const userNameSelect = document.getElementById('user-name');
-            const individualNameSelect = document.getElementById('individual-name'); // New reference to the individual dropdown
-            const userPhoneInput = document.getElementById('user-phone');
-            const companyEmailInput = document.getElementById('company-email');
-            const partsContainer = document.getElementById('parts-container');
-            const addPartBtn = document.getElementById('add-part-btn');
-            const formMainContent = document.querySelector('form');
+        const CHECKLIST_SECTIONS = [
+            // [Section 1]
+            {
+                title: "Interior: Cosmetic & Structure",
+                items: [
+                    { item: "Batten Strips/Trim", location: "Throughout", description: "Loose, missing, or misaligned strips." },
+                    { item: "Wall/Ceiling Seams", location: "Throughout", description: "Obvious gaps or large cracks in drywall/seams." },
+                    { item: "Flooring", location: "Throughout", description: "Squeaks, bubbles, loose tiles, or lifted seams." },
+                    { item: "Doors (Interior)", location: "Throughout", description: "Do not latch, stick, rub the frame, or have loose hardware." },
+                    { item: "Doors (Exterior)", location: "Front/Back", description: "Seal properly, latch securely, and align correctly." },
+                    { item: "Cabinets/Drawers", location: "Kitchen/Baths", description: "Loose hinges, drawers stick, missing hardware, or visible damage." },
+                    { item: "Countertops", location: "Kitchen/Baths", description: "Scratches, chips, or loose/lifting seams." },
+                    { item: "Vinyl/Laminate", location: "Throughout", description: "Scratches, dents, or tears on finished surfaces." },
+                    { item: "Windows", location: "Throughout", description: "Screens installed, open/close smoothly, and lock securely." },
+                    { item: "Faucets/Fixtures", location: "Kitchen/Baths", description: "Loose handles or visible leaks at the base/connection." },
+                ]
+            },
+            // [Section 2]
+            {
+                title: "Plumbing, Electrical, & Appliances",
+                items: [
+                    { item: "Water Flow/Pressure", location: "All Sinks/Tubs", description: "Test all faucets; check for low pressure or unusual noise." },
+                    { item: "Toilets", location: "All Bathrooms", description: "Flush properly, no running or leaks at the base." },
+                    { item: "Water Heater", location: "Utility/Exterior", description: "Functioning (providing hot water). Check for leaks near the unit." },
+                    { item: "GFCI Outlets", location: "Kitchen/Baths/Exterior", description: "Press TEST button to ensure they trip, then press RESET." },
+                    { item: "Switches & Outlets", location: "Throughout", description: "All switches operate their lights/fans; outlets have power." },
+                    { item: "Smoke/Carbon Monoxide Alarms", location: "Throughout", description: "Test all alarms (usually a test button on the unit)." },
+                    { item: "Appliances", location: "Kitchen", description: "Range, Dishwasher, Microwave, Refrigerator are fully operational." },
+                ]
+            },
+            // [Section 3]
+            {
+                title: "Exterior & HVAC",
+                items: [
+                    { item: "Siding & Skirting", location: "Exterior", description: "Missing panels, dents, gaps, or improperly fastened skirting." },
+                    { item: "Roof Vents/Shingles", location: "Roof/Exterior", description: "Check for loose shingles, damage, or open vents/seals." },
+                    { item: "HVAC (Heat/AC)", location: "Thermostat/Units", description: "Run both Heat and Cooling cycles to ensure proper function." },
+                    { item: "Ductwork/Vents", location: "Floor/Ceiling", description: "Vents are securely fastened and air is flowing strongly to all rooms." },
+                    { item: "Home Leveling", location: "Foundation", description: "Check for noticeable slopes in floors or difficulty closing doors (structural issue)." },
+                    { item: "Tie-Downs/Anchors", location: "Under Home", description: "Visibly check anchors/straps for obvious signs of looseness or damage." },
+                ]
+            }
+        ];
 
-            let partCounter = 0;
+        let checklistState = {};
 
-            // Define part locations
-            const partLocations = [
-                "Exterior", 
-                "Primary Bedroom",
-                "Primary Bathroom",
-                "Bedroom #2",
-                "Bedroom #3",
-                "Bedroom #4",
-                "Flex Space",
-                "Hall",
-                "Guest Bath",
-                "Living Area",
-                "Laundry Area",
-                "Dining Area",
-                "Kitchen",
-                "Pantry",
-                "Marriage Line"
-            ];
-            
-            // Function to update the disabled state of the remove button
-            function updateRemoveButtonState() {
-                const parts = partsContainer.querySelectorAll('.part-entry');
-                if (parts.length <= 1) {
-                    removePartBtn.disabled = true;
-                    removePartBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        // --- DOM Elements ---
+        const form = document.getElementById('warranty-form');
+        const communitySelect = document.getElementById('community');
+        const otherCommunityDiv = document.getElementById('otherCommunityDiv');
+        const otherCommunityInput = document.getElementById('otherCommunity');
+        const statusDiv = document.getElementById('status-message');
+        const submitBtn = document.getElementById('submit-btn');
+        const checklistContainer = document.getElementById('checklist-container');
+        const formMainContent = document.querySelector('form');
+        const issueSummaryBox = document.getElementById('issue-summary-box');
+
+        // --- Utility Functions ---
+
+        /**
+         * Generates a unique ID for a checklist item.
+         */
+        const generateId = (item, location) => 
+            `${item.replace(/\s/g, '_')}_${location.replace(/\s/g, '_')}`.toLowerCase();
+
+        /**
+         * Gets the current submission date formatted as a string.
+         */
+        const getSubmissionDate = () => {
+            return new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        };
+
+        /**
+         * Initializes the checklist state object.
+         */
+        const initializeChecklistState = () => {
+            CHECKLIST_SECTIONS.forEach(section => {
+                section.items.forEach(item => {
+                    const id = generateId(item.item, item.location);
+                    checklistState[id] = {
+                        status: 'UNCHECKED',
+                        notes: '',
+                        item: item.item,
+                        location: item.location,
+                        description: item.description 
+                    };
+                });
+            });
+        };
+
+        /**
+         * Updates the summary box above the submit button.
+         * @param {number} issueCount 
+         * @param {number} emptyNotesCount 
+         */
+        const updateSummary = (issueCount, emptyNotesCount) => {
+            if (issueCount === 0) {
+                issueSummaryBox.classList.add('hidden');
+            } else {
+                issueSummaryBox.classList.remove('hidden');
+                issueSummaryBox.classList.remove('bg-red-100', 'text-red-800');
+                issueSummaryBox.classList.add('bg-yellow-50', 'text-yellow-800');
+
+                if (emptyNotesCount > 0) {
+                    issueSummaryBox.classList.add('bg-red-100', 'text-red-800');
+                    issueSummaryBox.innerHTML = `⚠️ **ERROR:** ${emptyNotesCount} issue(s) are marked but are missing required descriptions. Please add notes to submit.`;
+                    submitBtn.disabled = true;
                 } else {
-                    removePartBtn.disabled = false;
-                    removePartBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    issueSummaryBox.innerHTML = `✅ **${issueCount} issues** identified and described. Ready to submit.`;
+                    submitBtn.disabled = false;
                 }
             }
-            
-            // Function to add a new part entry
-            function addPartEntry() {
-                partCounter++;
-                const partDiv = document.createElement('div');
-                partDiv.classList.add('part-entry', 'bg-gray-50', 'p-4', 'rounded-lg', 'border', 'border-gray-200', 'space-y-4');
-                
-                partDiv.innerHTML = `
-                    <h3 class="font-semibold text-gray-700">Part #${partCounter}</h3>
-                    
-                    <div class="flex space-x-4">
-                        <div class="w-1/3 space-y-2">
-                            <label for="part-quantity-${partCounter}" class="block text-sm font-medium text-gray-700">Quantity</label>
-                            <input type="number" id="part-quantity-${partCounter}" name="part-quantity-${partCounter}" min="1" value="1" required 
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+        };
+
+
+        /**
+         * Renders the entire checklist into the DOM.
+         */
+        const renderChecklist = () => {
+            let issueCount = 0;
+            let emptyNotesCount = 0;
+            checklistContainer.innerHTML = ''; 
+
+            CHECKLIST_SECTIONS.forEach((section) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'space-y-3 p-4 bg-white rounded-xl shadow-md border border-gray-100';
+                sectionDiv.innerHTML = `<h2 class="text-2xl font-extrabold text-gray-800 border-b pb-2 mb-4">${section.title}</h2>`;
+
+                section.items.forEach((item) => {
+                    const id = generateId(item.item, item.location);
+                    const state = checklistState[id];
+                    const isIssue = state.status === 'ISSUE';
+
+                    if (isIssue) {
+                        issueCount++;
+                        if (state.notes.trim() === '') {
+                            emptyNotesCount++;
+                        }
+                    }
+
+                    const cardClasses = `p-4 rounded-lg border-2 transition-colors duration-200 card-${state.status}`;
+
+                    const itemHtml = `
+                        <div id="item-${id}" class="${cardClasses}">
+                            <div class="flex flex-col sm:flex-row justify-between items-start space-y-2 sm:space-y-0 sm:space-x-4 mb-2">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-lg text-gray-900">${item.item}</p>
+                                    <p class="text-sm text-gray-500">
+                                        <span class="font-medium text-gray-600">Location:</span> ${item.location}
+                                        <span class="mx-2 text-gray-300 hidden sm:inline">|</span>
+                                        <span class="font-medium text-gray-600">Check:</span> ${item.description}
+                                    </p>
+                                </div>
+                                <div class="flex space-x-2 flex-shrink-0 pt-1">
+                                    <button data-id="${id}" data-status="OK" class="status-btn px-3 py-1 text-sm font-medium rounded-full transition ${state.status === 'OK' ? 'bg-green-600 text-white shadow-md' : 'bg-green-100 text-green-700 hover:bg-green-200'}">
+                                        <span class="hidden sm:inline">Mark </span>OK
+                                    </button>
+                                    <button data-id="${id}" data-status="ISSUE" class="status-btn px-3 py-1 text-sm font-medium rounded-full transition ${state.status === 'ISSUE' ? 'bg-red-600 text-white shadow-md' : 'bg-red-100 text-red-700 hover:bg-red-200'}">
+                                        <span class="hidden sm:inline">Mark </span>Issue
+                                    </button>
+                                    <button data-id="${id}" data-status="UNCHECKED" class="status-btn px-3 py-1 text-sm font-medium rounded-full transition ${state.status === 'UNCHECKED' ? 'bg-gray-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}">
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            ${isIssue ? `
+                                <textarea
+                                    data-id="${id}"
+                                    class="notes-input mt-2 w-full p-3 border border-red-300 rounded-lg focus:ring-red-500 focus:border-red-500 text-gray-800"
+                                    placeholder="REQUIRED: Describe the issue in detail for repair submission (e.g., 'Squeak in hallway floor near linen closet')."
+                                    rows="2"
+                                >${state.notes}</textarea>
+                            ` : ''}
                         </div>
-                        <div class="w-2/3 space-y-2">
-                            <label for="part-location-${partCounter}" class="block text-sm font-medium text-gray-700">Part Location In Home</label>
-                            <select id="part-location-${partCounter}" name="part-location-${partCounter}" required 
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                                <option value="" disabled selected>Select location</option>
-                                ${partLocations.map(location => `<option value="${location}">${location}</option>`).join('')}
-                            </select>
-                        </div>
-                    </div>
+                    `;
+                    sectionDiv.insertAdjacentHTML('beforeend', itemHtml);
+                });
+                checklistContainer.appendChild(sectionDiv);
+            });
 
-                    <div class="space-y-2">
-                        <label for="part-description-${partCounter}" class="block text-sm font-medium text-gray-700">Part Description / Details</label>
-                        <textarea id="part-description-${partCounter}" name="part-description-${partCounter}" rows="2" required 
-                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"></textarea>
-                    </div>
+            updateSummary(issueCount, emptyNotesCount);
 
-                    <div class="space-y-2">
-                        <label for="part-reason-${partCounter}" class="block text-sm font-medium text-gray-700">Reason for Request</label>
-                        <select id="part-reason-${partCounter}" name="part-reason-${partCounter}" required 
-                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-                            <option value="" disabled selected>Select reason</option>
-                            <option value="Damaged">Damaged</option>
-                            <option value="Missing from Ship Loose">Missing from Ship Loose</option>
-                            <option value="Service">Service</option>
-                        </select>
-                    </div>
-                `;
-                partsContainer.appendChild(partDiv);
-                updateRemoveButtonState();
-            }
+            // Re-attach event listeners after rendering
+            document.querySelectorAll('.status-btn').forEach(button => {
+                button.addEventListener('click', handleStatusChange);
+            });
 
-            // Function to remove the last part entry
-            function removePartEntry() {
-                const parts = partsContainer.querySelectorAll('.part-entry');
-                if (parts.length > 1) {
-                    const lastPart = parts[parts.length - 1];
-                    partsContainer.removeChild(lastPart);
-                    partCounter--;
-                    updateRemoveButtonState();
+            document.querySelectorAll('.notes-input').forEach(input => {
+                input.addEventListener('input', handleNotesChange);
+            });
+        };
+
+        /**
+         * Updates the status of a checklist item and re-renders if necessary.
+         */
+        const handleStatusChange = (e) => {
+            const id = e.target.closest('.status-btn').dataset.id;
+            const newStatus = e.target.closest('.status-btn').dataset.status;
+
+            if (checklistState[id].status !== newStatus) {
+                checklistState[id].status = newStatus;
+                if (newStatus !== 'ISSUE') {
+                    checklistState[id].notes = '';
                 }
+                renderChecklist();
             }
+        };
 
-            // Function to reset the entire form and show it again
-            function resetForm() {
-                form.reset();
-                partsContainer.innerHTML = '';
-                partCounter = 0;
-                addPartEntry();
-                statusDiv.classList.add('hidden');
+        /**
+         * Updates the notes for a checklist item.
+         */
+        const handleNotesChange = (e) => {
+            const id = e.target.dataset.id;
+            checklistState[id].notes = e.target.value;
+            renderChecklist(); // Re-render to update the summary box immediately
+        };
+        
+        /**
+         * Toggles the visibility and required status of the 'Other Community' input.
+         */
+        const handleCommunityChange = () => {
+            if (communitySelect.value === 'Other') {
+                otherCommunityDiv.classList.remove('hidden');
+                otherCommunityInput.required = true;
+            } else {
                 otherCommunityDiv.classList.add('hidden');
                 otherCommunityInput.required = false;
-                otherCommunityInput.name = 'unused';
-                formMainContent.style.display = 'block';
-                updateRemoveButtonState(); // Ensure the button is disabled after reset
+                otherCommunityInput.value = '';
             }
+        };
 
-            // Initially add the first part entry
-            addPartEntry();
+        /**
+         * Validates the required homeowner info fields.
+         */
+        const validateHomeownerInfo = (formData) => {
+            if (!formData.homeownerName.trim()) return "Occupant Name is required.";
+            if (!formData.email.trim()) return "Email Address is required.";
+            // Validation check using the updated message
+            if (!formData.lotNumber.trim()) return "Lot Number or Street Address is required.";
+            if (!formData.community.trim()) return "Community selection is required.";
+            if (formData.community === 'Other' && !formData.otherCommunity.trim()) return "Please specify the Other Community Name.";
+            return null;
+        };
 
-            // Event listeners
-            addPartBtn.addEventListener('click', addPartEntry);
-            removePartBtn.addEventListener('click', removePartEntry);
-            
-            // --- NEW CONTACT LOGIC ---
-            // 1. Contact information for each individual
-            const individualContacts = {
-                'Carl Thomas': { phone: '817-902-9543', email: '345hsllc@gmail.com' },
-                'Jerry Velasquez': { phone: '903-715-3217', email: 'jerryleevmhs@outlook.com' },
-                'Ray Howell': { phone: '817-902-5404', email: 'big.eagle77@yahoo.com' },
-                'Shawn Thomas': { phone: '817-995-1818', email: 'shawn.thomas@peakmhc.com' }, // <-- UPDATED EMAIL
-                'Jason Cappers': { phone: '318-540-9909', email: 'jason.cappers@peakenterprises.com' },
-                'Jeff Braswell': { phone: '940-594-2891', email: 'jeff.braswell@peakenterprises.com' },
-                'Chris Brown': { phone: '512-777-0351', email: 'chris.brown@peakenterprises.com' }
+        /**
+         * Compiles all submission data and the formatted report.
+         */
+        const compileSubmissionData = () => {
+            const formData = {
+                homeownerName: form.elements.homeownerName.value.trim(),
+                occupancyStatus: form.elements.occupancyStatus.value, // Added for new field
+                community: form.elements.community.value,
+                otherCommunity: form.elements.otherCommunity ? form.elements.otherCommunity.value.trim() : '',
+                lotNumber: form.elements.lotNumber.value.trim(),
+                serialNumber: form.elements.serialNumber.value.trim(),
+                contactPhone: form.elements.contactPhone.value.trim(),
+                email: form.elements.email.value.trim(),
             };
+            
+            const finalCommunity = formData.community === 'Other' ? formData.otherCommunity : formData.community;
+            const submissionDate = getSubmissionDate();
+            
+            const issuesList = Object.values(checklistState).filter(item => 
+                item.status === 'ISSUE' && item.notes.trim() !== ''
+            );
 
-            // 2. Event listener to auto-populate phone number and email based on the INDIVIDUAL
-            individualNameSelect.addEventListener('change', (event) => {
-                const selectedIndividual = event.target.value;
-                const contacts = individualContacts[selectedIndividual];
-                
-                // Clear company contact info, as it is no longer used for auto-fill
-                // We are now only auto-filling the individual's contact fields
-                if (contacts) {
-                    userPhoneInput.value = contacts.phone;
-                    companyEmailInput.value = contacts.email;
-                } else {
-                    userPhoneInput.value = '';
-                    companyEmailInput.value = '';
+            const issuesReport = issuesList.map((item, index) => {
+                const locationDetail = item.location ? ` (Location: ${item.location})` : '';
+                return `**${index + 1}. ${item.item}${locationDetail}**\nDescription: ${item.notes}\n`;
+            }).join('\n');
+
+            // Update label in the final report text
+            const finalReportText = `*** Property Information ***\n` +
+                                   `Occupant Name: ${formData.homeownerName}\n` + 
+                                   `Occupancy Status: ${formData.occupancyStatus}\n` + 
+                                   `Community: ${finalCommunity}\n` +
+                                   `Lot/Street Address: ${formData.lotNumber}\n` + // Updated label
+                                   `Serial #: ${formData.serialNumber}\n` +
+                                   `Phone: ${formData.contactPhone}\n` +
+                                   `Email: ${formData.email}\n` +
+                                   `Date: ${submissionDate}\n\n` +
+                                   `*** Reported Issues (${issuesList.length} Total) ***\n` +
+                                   (issuesReport || 'No actionable issues with description were reported.');
+
+            return {
+                formData,
+                issuesList,
+                submissionDate,
+                finalCommunity,
+                finalReportText,
+                // EmailJS requires specific keys that match the templates we previously verified
+                emailParams: {
+                    'homeownerName': formData.homeownerName,
+                    'occupancyStatus': formData.occupancyStatus, // Added for EmailJS
+                    'community': finalCommunity,
+                    'lotNumber': formData.lotNumber, // Note: Variable name remains 'lotNumber' but contains address/lot data
+                    'serialNumber': formData.serialNumber,
+                    'contactPhone': formData.contactPhone,
+                    'email': formData.email,
+                    'SubmissionDate': submissionDate,
+                    'toEmail': 'warranty@peakmhc.com', // Recipient for the primary template
+                    'totalissues': issuesList.length,
+                    'issuesReport': finalReportText, // The compiled report body
                 }
-            });
-            // --- END NEW CONTACT LOGIC ---
+            };
+        };
 
-            // Handle "Other" option in community dropdown
-            communitySelect.addEventListener('change', (event) => {
-                if (event.target.value === 'Other') {
-                    otherCommunityDiv.classList.remove('hidden');
-                    otherCommunityInput.required = true;
-                    otherCommunityInput.name = 'home-address';
-                } else {
-                    otherCommunityDiv.classList.add('hidden');
-                    otherCommunityInput.required = false;
-                    otherCommunityInput.name = 'unused';
-                }
-            });
 
-            emailjs.init(USER_ID);
+        /**
+         * Handles the final submission of data via EmailJS (using the working Promise chain).
+         */
+        const handleSubmission = (event) => {
+            event.preventDefault();
+            
+            const { formData, emailParams } = compileSubmissionData();
+            
+            // 1. Final Client-Side Validation
+            const infoError = validateHomeownerInfo(formData);
+            if (infoError) {
+                statusDiv.classList.remove('hidden');
+                statusDiv.classList.add('bg-red-100', 'text-red-800');
+                statusDiv.innerHTML = `<strong>Error!</strong> ${infoError}`;
+                return;
+            }
+            if (submitBtn.disabled) {
+                // This check relies on updateSummary running, which updates submitBtn.disabled
+                statusDiv.classList.remove('hidden');
+                statusDiv.classList.add('bg-red-100', 'text-red-800');
+                statusDiv.innerHTML = `<strong>Error!</strong> Please provide descriptions for all marked issues.`;
+                return;
+            }
+            
+            // 2. Set UI to Sending (using the working app's proven flow)
+            formMainContent.style.display = 'none';
+            statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+            statusDiv.classList.add('bg-blue-100', 'text-blue-800');
+            statusDiv.innerHTML = 'Sending request... Please wait.';
+            submitBtn.disabled = true;
 
-            document.getElementById('parts-form').addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const companyEmail = form.elements['company-email'].value.trim();
-                
-                // New, more robust validation check
-                if (!companyEmail) {
-                    // Show validation error for email
-                    statusDiv.classList.remove('hidden', 'bg-blue-100', 'text-blue-800', 'bg-green-100', 'text-green-800');
+            // 3. Initialize if not already done (defensive check)
+            if (!window.emailjs || !window.emailjs.send) {
+                 statusDiv.innerHTML = '<strong>Error!</strong> EmailJS library is not fully loaded. Please refresh the page.';
+                 return;
+            }
+            
+            // 4. Two-Step Submission via Promise Chain (The reliable method)
+            
+            // Step 1: Send the Primary Report to the warranty team
+            window.emailjs.send(SERVICE_ID, PRIMARY_TEMPLATE_ID, emailParams)
+                .then(function() {
+                    // Step 2: Primary sent. Send Confirmation email to the homeowner.
+                    return window.emailjs.send(SERVICE_ID, CONFIRMATION_TEMPLATE_ID, emailParams);
+                })
+                .then(function() {
+                    // Success: Both emails sent. Show success message.
+                    statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
+                    statusDiv.classList.add('bg-green-100', 'text-green-800');
+                    statusDiv.innerHTML = '<strong>Success!</strong> Your request has been sent, and a confirmation email has been sent to your inbox. <br><br> <button id="continue-btn" class="py-2 px-4 mt-2 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold transition duration-150 ease-in-out">Submit Another Request</button>';
+                    
+                    document.getElementById('continue-btn').addEventListener('click', resetForm);
+                }, function(error) {
+                    // Failure: Could be Primary or Confirmation email failure.
+                    let errorMessage = 'There was an error sending your request.';
+                    if (error && error.text) {
+                         errorMessage = `Error: ${error.text}`;
+                    }
+                    
+                    statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
                     statusDiv.classList.add('bg-red-100', 'text-red-800');
-                    statusDiv.innerHTML = '<strong>Error!</strong> Please provide a valid company email address.';
+                    statusDiv.innerHTML = `<strong>Failed!</strong> ${errorMessage}`;
+                    console.error('EmailJS Error:', error);
+                    
+                    // Show form content again on failure
                     formMainContent.style.display = 'block';
-                    return; // Stop the function from proceeding
-                }
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                });
+        };
+        
+        /**
+         * Resets the form after a successful submission.
+         */
+        const resetForm = () => {
+             form.reset();
+             initializeChecklistState(); // Reset checklist data
+             renderChecklist(); // Rerender to show clean list
+             statusDiv.classList.add('hidden');
+             formMainContent.style.display = 'block';
+        };
 
-                // Show loading state and hide the form
-                formMainContent.style.display = 'none';
-                statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
-                statusDiv.classList.add('bg-blue-100', 'text-blue-800');
-                statusDiv.innerHTML = 'Sending request...';
-                
-                submitBtn.disabled = true;
-                
-                // Collect all part data and build the string
-                const partDescriptions = document.querySelectorAll('[name^="part-description-"]');
-                const partLocations = document.querySelectorAll('[name^="part-location-"]');
-                const partQuantities = document.querySelectorAll('[name^="part-quantity-"]');
-                const partReasons = document.querySelectorAll('[name^="part-reason-"]'); // NEW: Get reasons
-                
-                let partsString = '';
-                for (let i = 0; i < partDescriptions.length; i++) {
-                    partsString += `Part #${i + 1}:\n`;
-                    partsString += `  Quantity: ${partQuantities[i].value}\n`;
-                    partsString += `  Location: ${partLocations[i].value}\n`;
-                    partsString += `  Reason: ${partReasons[i].value}\n`; // NEW: Include reason
-                    partsString += `  Description: ${partDescriptions[i].value}\n\n`;
-                }
+        /**
+         * Initializes the app on window load.
+         */
+        const initApp = () => {
+             if (window.emailjs) {
+                 window.emailjs.init(USER_ID);
+             }
 
-                const orderRequestParams = {
-                    'user-name': form.elements['user-name'].value,
-                    'company-email': companyEmail,
-                    'user-phone': form.elements['user-phone'].value,
-                    'individual-name': form.elements['individual-name'].value,
-                    'home-address': communitySelect.value === 'Other' ? otherCommunityInput.value : communitySelect.value,
-                    'lot-number': form.elements['lot-number'].value,
-                    'serial-number': form.elements['serial-number'].value,
-                    'home-manufacturer': form.elements['home-manufacturer'].value,
-                    'part-description': partsString,
-                };
-                
-                const confirmationParams = {
-                    'to_email': companyEmail,
-                    'user-name': form.elements['user-name'].value,
-                    'individual-name': form.elements['individual-name'].value,
-                    'user-phone': form.elements['user-phone'].value,
-                    'company-email': companyEmail,
-                    'home-address': communitySelect.value === 'Other' ? otherCommunityInput.value : communitySelect.value,
-                    'lot-number': form.elements['lot-number'].value,
-                    'serial-number': form.elements['serial-number'].value,
-                    'home-manufacturer': form.elements['home-manufacturer'].value,
-                    'part-description': partsString,
-                };
+             initializeChecklistState();
+             renderChecklist();
+             
+             // Event Listeners
+             document.getElementById('community').addEventListener('change', handleCommunityChange);
+             form.addEventListener('submit', handleSubmission);
+        }
 
-                // First, send the parts order request
-                emailjs.send(SERVICE_ID, TEMPLATE_ID, orderRequestParams)
-                    .then(function() {
-                        // On success, send the confirmation email to the user
-                        return emailjs.send(SERVICE_ID, CONFIRMATION_TEMPLATE_ID, confirmationParams);
-                    })
-                    .then(function() {
-                        // Show success message with a Continue button after both emails are sent
-                        statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
-                        statusDiv.classList.add('bg-green-100', 'text-green-800');
-                        statusDiv.innerHTML = '<strong>Success!</strong> Your parts order has been sent, and a confirmation email has been sent to your inbox. <br><br> <button id="continue-btn" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-full text-white font-bold transition duration-150 ease-in-out">Continue</button>';
-                        
-                        // Add event listener to the newly created button
-                        document.getElementById('continue-btn').addEventListener('click', resetForm);
-                    }, function(error) {
-                        // Handle failure of either email and show the form again
-                        statusDiv.classList.remove('bg-blue-100', 'text-blue-800');
-                        statusDiv.classList.add('bg-red-100', 'text-red-800');
-                        statusDiv.innerHTML = `<strong>Failed!</strong> There was an error sending your request. Error: ${JSON.stringify(error)}`;
-                        console.error('EmailJS Error:', error);
-                        formMainContent.style.display = 'block';
-                    })
-                    .finally(() => {
-                        submitBtn.disabled = false;
-                    });
-            });
-        })();
+        // --- Initialization ---
+        window.onload = initApp;
     </script>
 </body>
 </html>
